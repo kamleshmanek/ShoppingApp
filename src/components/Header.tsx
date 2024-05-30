@@ -1,4 +1,4 @@
-import {I18nManager, Image, Text, TouchableOpacity, View} from 'react-native';
+import {Animated, I18nManager, Image, Text, TouchableOpacity, View} from 'react-native';
 import styles from '../styles/styles';
 import React, {useEffect, useState} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -6,9 +6,10 @@ import RNRestart from 'react-native-restart';
 
 interface HeaderProps {
   cartItem: number;
+  animatedValue: Animated.Value;
 }
 
-const Header: React.FC<HeaderProps> = ({cartItem}) => {
+const Header: React.FC<HeaderProps> = ({cartItem,animatedValue}) => {
   const [language, setLanguage] = useState<string>('en');
   useEffect(() => {
     const getLanguage = async () => {
@@ -47,20 +48,31 @@ const Header: React.FC<HeaderProps> = ({cartItem}) => {
     }
   };
 
+  const animatedStyle = {
+    transform: [
+      {
+        scale: animatedValue.interpolate({
+          inputRange: [0, 1],
+          outputRange: [1, 1.5],
+        }),
+      },
+    ],
+  };
+
   return (
     <View style={styles.headerContainer}>
       <TouchableOpacity onPress={toggleLanguage}>
         <Text style={styles.language}>{language === 'en' ? 'AR' : 'EN'}</Text>
       </TouchableOpacity>
       <Text style={styles.titleText}>{'Home'}</Text>
-      <TouchableOpacity>
+      <Animated.View style={animatedStyle}>
         <Image style={styles.cartIcon} source={require('../icons/cart.png')} />
         {cartItem > 0 && (
           <View style={styles.cartCount}>
             <Text style={styles.cartCountText}>{cartItem}</Text>
           </View>
         )}
-      </TouchableOpacity>
+      </Animated.View>
     </View>
   );
 };

@@ -1,4 +1,4 @@
-import React, { createContext, useReducer, ReactNode, useEffect } from 'react';
+import React, { createContext, useReducer, useEffect, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface Product {
@@ -36,7 +36,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
     case 'REMOVE_FROM_CART':
       return { ...state, items: state.items.filter(item => item.id !== (action.payload as Product).id) };
     case 'SET_CART':
-      return { ...state, items: action.payload as Product[] };
+      return { ...state, items: Array.isArray(action.payload) ? action.payload : [] };
     default:
       return state;
   }

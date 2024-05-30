@@ -3,10 +3,9 @@ import React, {useEffect, useState, useContext} from 'react';
 import {
   View,
   FlatList,
-  Animated,
   SafeAreaView,
-  Text,
   ActivityIndicator,
+  Animated
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -37,6 +36,7 @@ const HomeScreen: React.FC = () => {
   const [cartItems, setCartItems] = useState<number>(0);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [animatedValue] = useState(new Animated.Value(0));
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -54,16 +54,23 @@ const HomeScreen: React.FC = () => {
       setLoading(false);
     };
     fetchProducts();
-  }, [page, cartItems]);
+  }, [page]);
 
   const handleAddToCart = (product: Product) => {
     dispatch({type: 'ADD_TO_CART', payload: product});
+    Animated.spring(animatedValue, {
+      toValue: 1,
+      useNativeDriver: true,
+    }).start(() => {
+      setCartItems(state.items.length);
+      animatedValue.setValue(0);
+    });
   };
 
   return (
     <SafeAreaView style={styles.topContainer}>
       <View style={styles.container}>
-        <Header cartItem={cartItems} />
+        <Header cartItem={cartItems} animatedValue={animatedValue} />
         <FlatList
           data={products}
           contentContainerStyle={styles.list}
